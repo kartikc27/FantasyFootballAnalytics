@@ -11,90 +11,127 @@ import org.jsoup.select.Elements;
 
 public class DataCollector {
 	private int week;
-	private HashMap<Player, Double> quarterbacks;
-	private HashMap<Player, Double> runningbacks;
-	private HashMap<Player, Double> widereceivers;
-	private HashMap<Player, Double> tightends;
-	private HashMap<Player, Double> defenses;
-	private HashMap<Player, Double> kickers;
-	Elements scrapedQBs = new Elements();
-	Elements scrapedRBs = new Elements();
-	Elements scrapedWRs = new Elements();
-	Elements scrapedTEs = new Elements();
-	Elements scrapedDSTs = new Elements();
+	private ArrayList<Player> quarterbacks = new ArrayList<Player>();
+	private ArrayList<Player> runningbacks = new ArrayList<Player>();
+	private ArrayList<Player> widereceivers = new ArrayList<Player>();
+	private ArrayList<Player> tightends = new ArrayList<Player>();
+	private ArrayList<Player> defenses = new ArrayList<Player>();
+	Elements scraped = new Elements();
 	
-	
+
 	public DataCollector(int week) {
 		this.week = week;
-	    String url = "http://fantasyprospartners.appspot.com/draftkingsSalaryCap?sport=nfl&expertId=95&s=Kevin%20Hanson%20%2F%20EDSFootball&aff_url=http%3A%2F%2Fpartners.draftkings.com%2Faff_c%3Foffer_id%3D124%26aff_id%3D21400&h=1000";
-	    try {
+		if (week == 9) {
+			String url = "http://fantasyprospartners.appspot.com/draftkingsSalaryCap?sport=nfl&expertId=95&s=Kevin%20Hanson%20%2F%20EDSFootball&aff_url=http%3A%2F%2Fpartners.draftkings.com%2Faff_c%3Foffer_id%3D124%26aff_id%3D21400&h=1000";
+		
+		try {
 			Document document = Jsoup.connect(url).get();
-			Elements scraped = document.select("table tr");
-			
-
-			
-			for (int i = 1; i < scraped.size(); i++) {
-				System.out.println(scraped.get(i).text());
-				scrapedQBs.addAll(scraped.get(i).getElementsContainingText("QB"));
-				scrapedRBs.addAll(scraped.get(i).getElementsContainingText("RB"));
-				scrapedWRs.addAll(scraped.get(i).getElementsContainingText("WR"));
-				scrapedTEs.addAll(scraped.get(i).getElementsContainingText("TE"));
-				scrapedDSTs.addAll(scraped.get(i).getElementsContainingText("DST"));
-				
-				if ((scraped.get(i).getElementsContainingText("QB")).size() > 1) {
-					//Player p = new Player(scraped.get(i).data());
-					//System.out.println(scraped.get(i).text());
-				}
-			}
-			for (int i = 0; i < scrapedQBs.size(); i+=1 ) {
-				scrapedQBs.remove(i);
-			}
-			for (int i = 0; i < scrapedRBs.size(); i+=1 ) {
-				scrapedRBs.remove(i);
-			}
-			for (int i = 0; i < scrapedWRs.size(); i+=1 ) {
-				scrapedWRs.remove(i);
-			}
-			for (int i = 0; i < scrapedTEs.size(); i+=1 ) {
-				scrapedTEs.remove(i);
-			}
-			for (int i = 0; i < scrapedDSTs.size(); i+=1 ) {
-				scrapedDSTs.remove(i);
-			}
-//			System.out.println(scrapedQBs.size());
-//			System.out.println(scrapedRBs.size());
-//			System.out.println(scrapedWRs.size());
-//			System.out.println(scrapedTEs.size());
-//			System.out.println(scrapedDSTs.size());
-//			
-//			for (int i = 0; i < scrapedQBs.size(); i++) {
-//		        System.out.println(scrapedQBs.get(i).text());
-//			}
-//			for (int i = 0; i < scrapedRBs.size(); i++) {
-//		        System.out.println(scrapedRBs.get(i).text());
-//			}
-//			for (int i = 0; i < scrapedWRs.size(); i++) {
-//		        System.out.println(scrapedWRs.get(i).text());
-//			}
-//			for (int i = 0; i < scrapedTEs.size(); i++) {
-//		        System.out.println(scrapedTEs.get(i).text());
-//			}
-//			for (int i = 0; i < scrapedDSTs.size(); i++) {
-//		        System.out.println(scrapedDSTs.get(i).text());
-//			}
-			
+			scraped = document.select("table tr");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
+
+		
+		for (int i = 1; i < scraped.size(); i++) {
+			if ((scraped.get(i).getElementsContainingText("QB")).size() > 1) {
+				String text = scraped.get(i).text();
+				String delims = "[ ]+";
+				String[] tokens = text.split(delims);
+				String name = tokens[0] + " " + tokens[1];
+				String opponent = tokens[6];
+				String projectionStr = tokens[10]; 
+				double projection = Double.parseDouble(projectionStr);
+				String salaryStr = tokens[12];
+				salaryStr = salaryStr.replaceAll("[^\\d.]", "");
+				int salary = Integer.parseInt(salaryStr);
+				System.out.println (name + " " + opponent + " " + projection + " " + salary);
+				Player p = new Player("QB", name, opponent, projection, salary);
+				quarterbacks.add(p);
+			}
+			if ((scraped.get(i).getElementsContainingText("RB")).size() > 1) {
+				String text = scraped.get(i).text();
+				String delims = "[ ]+";
+				String[] tokens = text.split(delims);
+				String name = tokens[0] + " " + tokens[1];
+				String opponent = tokens[6];
+				String projectionStr = tokens[10]; 
+				double projection = Double.parseDouble(projectionStr);
+				String salaryStr = tokens[12];
+				salaryStr = salaryStr.replaceAll("[^\\d.]", "");
+				int salary = Integer.parseInt(salaryStr);
+				System.out.println (name + " " + opponent + " " + projection + " " + salary);
+				Player p = new Player("RB", name, opponent, projection, salary);
+				runningbacks.add(p);
+			}
+			if ((scraped.get(i).getElementsContainingText("WR")).size() > 1) {
+				String text = scraped.get(i).text();
+				String delims = "[ ]+";
+				String[] tokens = text.split(delims);
+				String name = tokens[0] + " " + tokens[1];
+				String opponent = tokens[6];
+				String projectionStr = tokens[10]; 
+				double projection = Double.parseDouble(projectionStr);
+				String salaryStr = tokens[12];
+				salaryStr = salaryStr.replaceAll("[^\\d.]", "");
+				int salary = Integer.parseInt(salaryStr);
+				System.out.println (name + " " + opponent + " " + projection + " " + salary);
+				Player p = new Player("WR", name, opponent, projection, salary);
+				widereceivers.add(p);
+			}
+			if ((scraped.get(i).getElementsContainingText("TE")).size() > 1) {
+				String text = scraped.get(i).text();
+				String delims = "[ ]+";
+				String[] tokens = text.split(delims);
+				String name = tokens[0] + " " + tokens[1];
+				String opponent = tokens[6];
+				String projectionStr = tokens[10]; 
+				double projection = Double.parseDouble(projectionStr);
+				String salaryStr = tokens[12];
+				salaryStr = salaryStr.replaceAll("[^\\d.]", "");
+				int salary = Integer.parseInt(salaryStr);
+				System.out.println (name + " " + opponent + " " + projection + " " + salary);
+				Player p = new Player("TE", name, opponent, projection, salary);
+				tightends.add(p);
+			}
+			if ((scraped.get(i).getElementsContainingText("DST")).size() > 1) {
+				String text = scraped.get(i).text();
+				String delims = "[ ]+";
+				String[] tokens = text.split(delims);
+				if ((tokens[0].equals("Kansas") ) || (tokens[0].equals("New")) || (tokens[0].equals("San")) || (tokens[0].equals("Tampa"))) {
+					String name = tokens[0] + " " + tokens[1] + " " + tokens[2];
+					String opponent = tokens[7];
+					String projectionStr = tokens[11]; 
+					double projection = Double.parseDouble(projectionStr);
+					String salaryStr = tokens[13];
+					salaryStr = salaryStr.replaceAll("[^\\d.]", "");
+					int salary = Integer.parseInt(salaryStr);
+					System.out.println (name + " " + opponent + " " + projection + " " + salary);
+					Player p = new Player("DST", name, opponent, projection, salary);
+					defenses.add(p);
+				}
+				else {
+					String name = tokens[0] + " " + tokens[1];
+					String opponent = tokens[6];
+					String projectionStr = tokens[10]; 
+					double projection = Double.parseDouble(projectionStr);
+					String salaryStr = tokens[12];
+					salaryStr = salaryStr.replaceAll("[^\\d.]", "");
+					int salary = Integer.parseInt(salaryStr);
+					System.out.println (name + " " + opponent + " " + projection + " " + salary);
+					Player p = new Player("DST", name, opponent, projection, salary);
+					defenses.add(p);
+				}
+				
+			}
+		}
 	}
-	
+
 	public static void main(String[] args) {
 
 		DataCollector data = new DataCollector(2);
 
 	}
-	
-	
+
+
 }
