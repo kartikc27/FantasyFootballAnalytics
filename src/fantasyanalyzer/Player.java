@@ -1,5 +1,7 @@
 package fantasyanalyzer;
 
+import java.text.DecimalFormat;
+
 
 
 public class Player {
@@ -13,5 +15,13 @@ public class Player {
 		this.opponent = opponent;
 		this.projection = projection;
 		this.salary = salary;
+	}
+	
+	public String toString() {
+        DecimalFormat df = new DecimalFormat("#.##");
+        if (name.length() < 15)
+        	return (name + "\t\t\t" + position + "\t" + df.format(projection) + "\t" + salary);
+        else
+        	return (name + "\t\t" + position + "\t" + df.format(projection) + "\t" + salary); 
 	}
 }

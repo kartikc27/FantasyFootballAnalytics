@@ -2,37 +2,31 @@ package fantasyanalyzer;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class DataCollector {
-	private int week;
-	private ArrayList<Player> quarterbacks = new ArrayList<Player>();
-	private ArrayList<Player> runningbacks = new ArrayList<Player>();
-	private ArrayList<Player> widereceivers = new ArrayList<Player>();
-	private ArrayList<Player> tightends = new ArrayList<Player>();
-	private ArrayList<Player> defenses = new ArrayList<Player>();
-	Elements scraped = new Elements();
-	
+	public ArrayList<Player> quarterbacks = new ArrayList<Player>();
+	public ArrayList<Player> runningbacks = new ArrayList<Player>();
+	public ArrayList<Player> widereceivers = new ArrayList<Player>();
+	public ArrayList<Player> tightends = new ArrayList<Player>();
+	public ArrayList<Player> defenses = new ArrayList<Player>();
+	public ArrayList<Player> flex = new ArrayList<Player>();
+	private Elements scraped = new Elements();
+
 
 	public DataCollector(int week) {
-		this.week = week;
-		if (week == 9) {
-			String url = "http://fantasyprospartners.appspot.com/draftkingsSalaryCap?sport=nfl&expertId=95&s=Kevin%20Hanson%20%2F%20EDSFootball&aff_url=http%3A%2F%2Fpartners.draftkings.com%2Faff_c%3Foffer_id%3D124%26aff_id%3D21400&h=1000";
-		
+		String url = "http://fantasyprospartners.appspot.com/draftkingsSalaryCap?sport=nfl&expertId=95&s=Kevin%20Hanson%20%2F%20EDSFootball&aff_url=http%3A%2F%2Fpartners.draftkings.com%2Faff_c%3Foffer_id%3D124%26aff_id%3D21400&h=1000";
 		try {
-			Document document = Jsoup.connect(url).get();
+			Document document = Jsoup.connect(url).timeout(0).get();
 			scraped = document.select("table tr");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		
 		for (int i = 1; i < scraped.size(); i++) {
 			if ((scraped.get(i).getElementsContainingText("QB")).size() > 1) {
 				String text = scraped.get(i).text();
@@ -45,9 +39,10 @@ public class DataCollector {
 				String salaryStr = tokens[12];
 				salaryStr = salaryStr.replaceAll("[^\\d.]", "");
 				int salary = Integer.parseInt(salaryStr);
-				System.out.println (name + " " + opponent + " " + projection + " " + salary);
+				//System.out.println (name + " " + opponent + " " + projection + " " + salary);
 				Player p = new Player("QB", name, opponent, projection, salary);
 				quarterbacks.add(p);
+				
 			}
 			if ((scraped.get(i).getElementsContainingText("RB")).size() > 1) {
 				String text = scraped.get(i).text();
@@ -60,7 +55,7 @@ public class DataCollector {
 				String salaryStr = tokens[12];
 				salaryStr = salaryStr.replaceAll("[^\\d.]", "");
 				int salary = Integer.parseInt(salaryStr);
-				System.out.println (name + " " + opponent + " " + projection + " " + salary);
+				//System.out.println (name + " " + opponent + " " + projection + " " + salary);
 				Player p = new Player("RB", name, opponent, projection, salary);
 				runningbacks.add(p);
 			}
@@ -75,7 +70,7 @@ public class DataCollector {
 				String salaryStr = tokens[12];
 				salaryStr = salaryStr.replaceAll("[^\\d.]", "");
 				int salary = Integer.parseInt(salaryStr);
-				System.out.println (name + " " + opponent + " " + projection + " " + salary);
+				//System.out.println (name + " " + opponent + " " + projection + " " + salary);
 				Player p = new Player("WR", name, opponent, projection, salary);
 				widereceivers.add(p);
 			}
@@ -90,7 +85,7 @@ public class DataCollector {
 				String salaryStr = tokens[12];
 				salaryStr = salaryStr.replaceAll("[^\\d.]", "");
 				int salary = Integer.parseInt(salaryStr);
-				System.out.println (name + " " + opponent + " " + projection + " " + salary);
+				//System.out.println (name + " " + opponent + " " + projection + " " + salary);
 				Player p = new Player("TE", name, opponent, projection, salary);
 				tightends.add(p);
 			}
@@ -106,7 +101,7 @@ public class DataCollector {
 					String salaryStr = tokens[13];
 					salaryStr = salaryStr.replaceAll("[^\\d.]", "");
 					int salary = Integer.parseInt(salaryStr);
-					System.out.println (name + " " + opponent + " " + projection + " " + salary);
+					//System.out.println (name + " " + opponent + " " + projection + " " + salary);
 					Player p = new Player("DST", name, opponent, projection, salary);
 					defenses.add(p);
 				}
@@ -118,20 +113,21 @@ public class DataCollector {
 					String salaryStr = tokens[12];
 					salaryStr = salaryStr.replaceAll("[^\\d.]", "");
 					int salary = Integer.parseInt(salaryStr);
-					System.out.println (name + " " + opponent + " " + projection + " " + salary);
+					//System.out.println (name + " " + opponent + " " + projection + " " + salary);
 					Player p = new Player("DST", name, opponent, projection, salary);
 					defenses.add(p);
 				}
-				
 			}
+			flex.addAll(runningbacks);
+			flex.addAll(widereceivers);
+			flex.addAll(tightends);
 		}
 	}
-
+	
 	public static void main(String[] args) {
-
-		DataCollector data = new DataCollector(2);
-
+		DataCollector data = new DataCollector(9);
+		LineupGenerator.generateInitialLineup(data);
+		
 	}
-
 
 }
