@@ -46,11 +46,18 @@ public class LineupGenerator {
 			System.out.println(playerSet[i].toString());
 		}
 	}
-
-
-
-
-
+	
+	public void simulatedAnnealing(DataCollector data) {
+		
+	}
+	
+	public void hillClimbing(DataCollector data) {
+	
+	}
+	
+	public void geneticAlgorithm(DataCollector data) {
+		
+	}
 
 }
 
