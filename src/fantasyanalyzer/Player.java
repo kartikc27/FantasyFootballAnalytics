@@ -19,7 +19,7 @@ public class Player {
 	
 	public String toString() {
         DecimalFormat df = new DecimalFormat("#.##");
-        if (name.length() < 15)
+        if (name.length() <= 15)
         	return (name + "\t\t\t" + position + "\t" + df.format(projection) + "\t" + salary);
         else
         	return (name + "\t\t" + position + "\t" + df.format(projection) + "\t" + salary); 

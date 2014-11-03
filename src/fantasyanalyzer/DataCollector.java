@@ -126,8 +126,7 @@ public class DataCollector {
 	
 	public static void main(String[] args) {
 		DataCollector data = new DataCollector(9);
-		LineupGenerator.generateInitialLineup(data);
-		
+		LineupGenerator.simulatedAnnealing(data);
 	}
 
 }
