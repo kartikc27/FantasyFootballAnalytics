@@ -48,55 +48,69 @@ public class LineupGenerator {
 	}
 	
 	public static void simulatedAnnealing(DataCollector data) {
-		double temp = 10000;
-		double coolingRate = 0.003;
+		float temp = Float.MAX_VALUE;
+		double coolingRate = 0.000001;
 		
 		Player[] currentLineup = new Player[9];
 		currentLineup = generateInitialLineup(data);
 		Player[] bestLineup = new Player[9];
 		bestLineup = currentLineup.clone();
-		
-		while (temp > 1) {
+		int count = 0;
+		while (temp > 1)  {
 			Player[] newLineup = new Player[9];
+			newLineup = currentLineup.clone();
 			int positionPos = (int) (newLineup.length * Math.random());
 			int playerPos = 0;
 			if (positionPos == 0) {
-				positionPos = (int) (data.quarterbacks.size() * Math.random());
-				newLineup[positionPos]  = data.quarterbacks.get(positionPos);
+				playerPos = (int) (data.quarterbacks.size() * Math.random());
+				if ((newLineup[1] != data.quarterbacks.get(playerPos)))
+				newLineup[positionPos]  = data.quarterbacks.get(playerPos);
 			}
 			if ((positionPos == 1) || (positionPos == 2)) {
-				positionPos = (int) (data.runningbacks.size() * Math.random());
-				newLineup[positionPos]  = data.runningbacks.get(positionPos);
+				playerPos = (int) (data.runningbacks.size() * Math.random());
+				if ((!(newLineup[1].name.equals(data.runningbacks.get(playerPos).name))) && 
+						(!(newLineup[2].name.equals(data.runningbacks.get(playerPos).name))))
+				newLineup[positionPos]  = data.runningbacks.get(playerPos);
 			}
-			if ((positionPos == 3) || (positionPos == 4) || (positionPos == 6)) {
-				positionPos = (int) (data.widereceivers.size() * Math.random());
-				newLineup[positionPos]  = data.widereceivers.get(positionPos);
+			if ((positionPos == 3) || (positionPos == 4) || (positionPos == 5)) {
+				playerPos = (int) (data.widereceivers.size() * Math.random());
+				if ((!(newLineup[3].name.equals(data.widereceivers.get(playerPos).name))) && 
+						(!(newLineup[4].name.equals(data.widereceivers.get(playerPos).name))) &&
+							(!(newLineup[5].name.equals(data.widereceivers.get(playerPos).name))))
+								newLineup[positionPos]  = data.widereceivers.get(playerPos);
+			}
+			if (positionPos == 6) {
+				playerPos = (int) (data.tightends.size() * Math.random());
+				newLineup[positionPos]  = data.tightends.get(playerPos);
 			}
 			if (positionPos == 7) {
-				positionPos = (int) (data.tightends.size() * Math.random());
-				newLineup[positionPos]  = data.tightends.get(positionPos);
+				playerPos = (int) (data.defenses.size() * Math.random());
+				newLineup[positionPos]  = data.defenses.get(playerPos);
 			}
 			if (positionPos == 8) {
-				positionPos = (int) (data.defenses.size() * Math.random());
-				newLineup[positionPos]  = data.defenses.get(positionPos);
-			}
-			if (positionPos == 9) {
-				positionPos = (int) (data.flex.size() * Math.random());
-				newLineup[positionPos]  = data.flex.get(positionPos);
+				playerPos = (int) (data.flex.size() * Math.random());
+				if ((!(newLineup[1].name.equals(data.flex.get(playerPos).name))) && 
+						(!(newLineup[2].name.equals(data.flex.get(playerPos).name))) &&
+							(!(newLineup[3].name.equals(data.flex.get(playerPos).name))) &&
+								(!(newLineup[4].name.equals(data.flex.get(playerPos).name))) &&
+										(!(newLineup[5].name.equals(data.flex.get(playerPos).name))) &&
+											(!(newLineup[6].name.equals(data.flex.get(playerPos).name))))
+				newLineup[positionPos]  = data.flex.get(playerPos);
 			}
 			
 			double currentEnergy = getPoints(currentLineup);
 			double neighbourEnergy = getPoints(newLineup);
 			
-			if (acceptanceProbability(currentEnergy, neighbourEnergy, temp) > Math.random()) {
+			if ((acceptanceProbability(currentEnergy, neighbourEnergy, temp) > Math.random()) && (getCost(newLineup) <= 50000)) {
                 currentLineup = newLineup.clone();
             }
 			
-			if (getPoints(currentLineup) > getPoints(bestLineup)) {
+			if (getPoints(currentLineup) > getPoints(bestLineup))  {
                 bestLineup = currentLineup.clone();
             }
 			
 			temp *= 1-coolingRate;
+			count ++;
 
 		}
 		
@@ -108,7 +122,7 @@ public class LineupGenerator {
 			cost += bestLineup[i].salary;
 		}
 		DecimalFormat df = new DecimalFormat("#.##");
-		System.out.println ("\nThe starting number of points is " + df.format(points) + " with a cost of " + cost);
+		System.out.println ("\nThe ending number of points is " + df.format(points) + " with a cost of " + cost);
 
 
 		
@@ -127,16 +141,21 @@ public class LineupGenerator {
 		
 	}
 	
-	public void geneticAlgorithm(DataCollector data) {
-		
-	}
 	
 	private static double getPoints(Player[] lineup) {
 		double points = 0;
-		for (int i = 0; i < lineup.length; i++) {
+		for (int i = 0; i < lineup.length; ++i) {
 			points += lineup[i].projection;
 		}
 		return points;
+	}
+	
+	private static int getCost(Player[] lineup) {
+		int cost = 0;
+		for (int i = 0; i < lineup.length; ++i) {
+			cost += lineup[i].salary;
+		}
+		return cost;
 	}
 
 }
