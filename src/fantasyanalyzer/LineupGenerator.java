@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class LineupGenerator {
 
-	public static Player[] generateInitialLineup(DataCollector data) {
+	public static Player[] generateInitialLineup(DataCollector data, String type) {
 		int cost = 0; 
 		Player[] playerSet = new Player[9];
 		while ((cost < 40000)) {
@@ -29,9 +29,9 @@ public class LineupGenerator {
 		for (int i = 0; i < playerSet.length; i++) {
 			points += playerSet[i].projection;
 		}
-		printLineup(playerSet);
+		printLineup(playerSet, type);
 		DecimalFormat df = new DecimalFormat("#.##");
-		System.out.println ("\nThe starting number of points is " + df.format(points) + " with a cost of " + cost);
+		System.out.println ("\nThe starting number of points is " + df.format(points) + " with a cost of " + cost +"\n");
 		return playerSet;
 	}
 
@@ -41,18 +41,28 @@ public class LineupGenerator {
 		return randomNum;
 	}
 
-	public static void printLineup(Player[] playerSet) {
-		for (int i = 0; i < playerSet.length; i++) {
-			System.out.println(playerSet[i].toString());
+	public static void printLineup(Player[] playerSet, String type) {
+		if (type.equals("propmonkey")) {
+			for (int i = 0; i < playerSet.length-1; i++) {
+				//if (i != 7)
+					playerSet[i].printExcel();
+//				else
+//					System.out.println(playerSet[7].toString());
+			}	
+		}
+		else if (type.equals("draftking")) {
+			for (int i = 0; i < playerSet.length; i++) {
+				System.out.println(playerSet[i].toString());
+			}
 		}
 	}
-	
-	public static void simulatedAnnealing(DataCollector data) {
+
+	public static void simulatedAnnealing(DataCollector data, String type)  {
 		float temp = Float.MAX_VALUE;
 		double coolingRate = 0.000001;
-		
+
 		Player[] currentLineup = new Player[9];
-		currentLineup = generateInitialLineup(data);
+		currentLineup = generateInitialLineup(data, type);
 		Player[] bestLineup = new Player[9];
 		bestLineup = currentLineup.clone();
 		int count = 0;
@@ -64,20 +74,20 @@ public class LineupGenerator {
 			if (positionPos == 0) {
 				playerPos = (int) (data.quarterbacks.size() * Math.random());
 				if ((newLineup[1] != data.quarterbacks.get(playerPos)))
-				newLineup[positionPos]  = data.quarterbacks.get(playerPos);
+					newLineup[positionPos]  = data.quarterbacks.get(playerPos);
 			}
 			if ((positionPos == 1) || (positionPos == 2)) {
 				playerPos = (int) (data.runningbacks.size() * Math.random());
 				if ((!(newLineup[1].name.equals(data.runningbacks.get(playerPos).name))) && 
 						(!(newLineup[2].name.equals(data.runningbacks.get(playerPos).name))))
-				newLineup[positionPos]  = data.runningbacks.get(playerPos);
+					newLineup[positionPos]  = data.runningbacks.get(playerPos);
 			}
 			if ((positionPos == 3) || (positionPos == 4) || (positionPos == 5)) {
 				playerPos = (int) (data.widereceivers.size() * Math.random());
 				if ((!(newLineup[3].name.equals(data.widereceivers.get(playerPos).name))) && 
 						(!(newLineup[4].name.equals(data.widereceivers.get(playerPos).name))) &&
-							(!(newLineup[5].name.equals(data.widereceivers.get(playerPos).name))))
-								newLineup[positionPos]  = data.widereceivers.get(playerPos);
+						(!(newLineup[5].name.equals(data.widereceivers.get(playerPos).name))))
+					newLineup[positionPos]  = data.widereceivers.get(playerPos);
 			}
 			if (positionPos == 6) {
 				playerPos = (int) (data.tightends.size() * Math.random());
@@ -91,30 +101,30 @@ public class LineupGenerator {
 				playerPos = (int) (data.flex.size() * Math.random());
 				if ((!(newLineup[1].name.equals(data.flex.get(playerPos).name))) && 
 						(!(newLineup[2].name.equals(data.flex.get(playerPos).name))) &&
-							(!(newLineup[3].name.equals(data.flex.get(playerPos).name))) &&
-								(!(newLineup[4].name.equals(data.flex.get(playerPos).name))) &&
-										(!(newLineup[5].name.equals(data.flex.get(playerPos).name))) &&
-											(!(newLineup[6].name.equals(data.flex.get(playerPos).name))))
-				newLineup[positionPos]  = data.flex.get(playerPos);
+						(!(newLineup[3].name.equals(data.flex.get(playerPos).name))) &&
+						(!(newLineup[4].name.equals(data.flex.get(playerPos).name))) &&
+						(!(newLineup[5].name.equals(data.flex.get(playerPos).name))) &&
+						(!(newLineup[6].name.equals(data.flex.get(playerPos).name))))
+					newLineup[positionPos]  = data.flex.get(playerPos);
 			}
-			
+
 			double currentEnergy = getPoints(currentLineup);
 			double neighbourEnergy = getPoints(newLineup);
-			
+
 			if ((acceptanceProbability(currentEnergy, neighbourEnergy, temp) > Math.random()) && (getCost(newLineup) <= 50000)) {
-                currentLineup = newLineup.clone();
-            }
-			
+				currentLineup = newLineup.clone();
+			}
+
 			if (getPoints(currentLineup) > getPoints(bestLineup))  {
-                bestLineup = currentLineup.clone();
-            }
-			
+				bestLineup = currentLineup.clone();
+			}
+
 			temp *= 1-coolingRate;
 			count ++;
 
 		}
-		
-		printLineup(bestLineup);
+
+		printLineup(bestLineup, type);
 		double points = 0;
 		int cost = 0;
 		for (int i = 0; i < bestLineup.length; i++) {
@@ -125,23 +135,23 @@ public class LineupGenerator {
 		System.out.println ("\nThe ending number of points is " + df.format(points) + " with a cost of " + cost);
 
 
-		
+
 	}
-	
+
 	public static double acceptanceProbability(double energy, double newEnergy, double temperature) {
-        // If the new solution is better, accept it
-        if (newEnergy < energy) {
-            return 1.0;
-        }
-        // If the new solution is worse, calculate an acceptance probability
-        return Math.exp((energy - newEnergy) / temperature);
-    }
-	
-	public void hillClimbing(DataCollector data) {
-		
+		// If the new solution is better, accept it
+		if (newEnergy < energy) {
+			return 1.0;
+		}
+		// If the new solution is worse, calculate an acceptance probability
+		return Math.exp((energy - newEnergy) / temperature);
 	}
-	
-	
+
+	public void hillClimbing(DataCollector data) {
+
+	}
+
+
 	private static double getPoints(Player[] lineup) {
 		double points = 0;
 		for (int i = 0; i < lineup.length; ++i) {
@@ -149,7 +159,7 @@ public class LineupGenerator {
 		}
 		return points;
 	}
-	
+
 	private static int getCost(Player[] lineup) {
 		int cost = 0;
 		for (int i = 0; i < lineup.length; ++i) {

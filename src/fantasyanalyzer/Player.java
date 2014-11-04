@@ -24,4 +24,14 @@ public class Player {
         else
         	return (name + "\t\t" + position + "\t" + df.format(projection) + "\t" + salary); 
 	}
+
+	public void printExcel() {
+		DecimalFormat df = new DecimalFormat("#.##");
+        if (name.length() < 8)
+        	System.out.println (name + "\t\t\t" + position + "\t" + df.format(projection) + "\t" + salary);
+        else if (name.length() < 15)
+        	System.out.println (name + "\t\t" + position + "\t" + df.format(projection) + "\t" + salary);
+        else 
+        	System.out.println (name + "\t" + position + "\t" + df.format(projection) + "\t" + salary);
+	}
 }
