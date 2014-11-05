@@ -69,8 +69,11 @@ public class LineupGenerator {
 				bestScore = getPoints(lineup);
 			}
 		}
+		DecimalFormat df = new DecimalFormat("#.##");
+		System.out.println ("\nThe best lineup is: \n" );
+		printLineup(bestLineup, type);
+		System.out.println("\nThe best score is: " + df.format(bestScore));
 		
-		System.out.println("The meta score is: " + bestScore);
 	}
 
 	public static Player[] simulatedAnnealing(DataCollector data, String type)  {
