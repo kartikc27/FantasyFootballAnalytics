@@ -24,13 +24,27 @@ public class DataCollector {
 
 
 	public DataCollector(int week, String method) throws BiffException, IOException {
-		String url = "http://fantasyprospartners.appspot.com/draftkingsSalaryCap?sport=nfl&expertId=95&s=Kevin%20Hanson%20%2F%20EDSFootball&aff_url=http%3A%2F%2Fpartners.draftkings.com%2Faff_c%3Foffer_id%3D124%26aff_id%3D21400&h=1000";
+		String url = "";
+		if (week == 10)
+			url = "http://fantasyprospartners.appspot.com/draftkingsSalaryCap?sport=nfl&week=10&expertId=-1&h=750";
+		else if (week == 9)
+			url = "http://fantasyprospartners.appspot.com/draftkingsSalaryCap?sport=nfl&expertId=95&s=Kevin%20Hanson%20%2F%20EDSFootball&aff_url=http%3A%2F%2Fpartners.draftkings.com%2Faff_c%3Foffer_id%3D124%26aff_id%3D21400&h=1000";
+		else if (week == 8) 
+			url = "http://fantasyprospartners.appspot.com/draftkingsSalaryCap?sport=nfl&week=8&expertId=-1&h=750";
+		else if (week == 7)
+			url = "http://fantasyprospartners.appspot.com/draftkingsSalaryCap?sport=nfl&week=7&expertId=-1&h=750";
+		else if (week == 6)
+			url = "http://fantasyprospartners.appspot.com/draftkingsSalaryCap?sport=nfl&week=6&expertId=-1&h=750";
+		else if (week == 5)
+			url = "http://fantasyprospartners.appspot.com/draftkingsSalaryCap?sport=nfl&week=5&expertId=-1&h=750";
+		else if (week == 4)
+			url = "http://fantasyprospartners.appspot.com/draftkingsSalaryCap?sport=nfl&week=4&expertId=-1&h=750";
 
 		Document document = Jsoup.connect(url).timeout(0).get();
 		scraped = document.select("table tr");
 
 
-		if (method.equals("draftking")) {
+		if (method.equals("fantasypros")) {
 			if (scraped.size() > 0) {
 				for (int i = 1; i < scraped.size(); i++) {
 					//System.out.println("data scrape successful");
@@ -91,6 +105,7 @@ public class DataCollector {
 					}
 					if ((scraped.get(i).getElementsContainingText("TE")).size() > 1) {
 						String text = scraped.get(i).text();
+						
 						String delims = "[ ]+";
 						String[] tokens = text.split(delims);
 						String name = tokens[0] + " " + tokens[1];
@@ -111,7 +126,7 @@ public class DataCollector {
 						String text = scraped.get(i).text();
 						String delims = "[ ]+";
 						String[] tokens = text.split(delims);
-						if ((tokens[0].equals("Kansas") ) || (tokens[0].equals("New")) || (tokens[0].equals("San")) || (tokens[0].equals("Tampa"))) {
+						if ((tokens[0].equals("Kansas") ) || (tokens[0].equals("New")) || (tokens[0].equals("San")) || (tokens[0].equals("Tampa")) || (tokens[0].equals("Green")) || (tokens[0].equals("St.")) ) {
 							String name = tokens[0] + " " + tokens[1] + " " + tokens[2];
 							String opponent = tokens[7];
 							String projectionStr = tokens[11]; 
@@ -227,11 +242,12 @@ public class DataCollector {
 			//				System.out.println(defenses.get(i).toString());
 			//			}
 		}
+		
 	}
 
 	public static void main(String[] args) throws BiffException, IOException {
-		DataCollector data = new DataCollector(9, "propmonkey");
-		LineupGenerator.simulatedAnnealing(data, "propmonkey");
+		DataCollector data = new DataCollector(10, "fantasypros");
+		LineupGenerator.simulatedAnnealing(data, "fantasypros");
 	}
 
 

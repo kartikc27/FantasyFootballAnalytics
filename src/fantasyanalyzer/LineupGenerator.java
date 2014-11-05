@@ -8,8 +8,8 @@ public class LineupGenerator {
 	public static Player[] generateInitialLineup(DataCollector data, String type) {
 		int cost = 0; 
 		Player[] playerSet = new Player[9];
-		while ((cost < 40000)) {
-			if ((cost > 50000) || (cost < 40000)) {
+		while ((cost < 44000)) {
+			if ((cost > 50000) || (cost < 44000)) {
 				cost = 0;
 				playerSet[0] = data.quarterbacks.get(generateRandomIndex(data.quarterbacks.size()-1));
 				playerSet[1] = data.runningbacks.get(generateRandomIndex(data.runningbacks.size()-1));
@@ -20,9 +20,7 @@ public class LineupGenerator {
 				playerSet[6] = data.tightends.get(generateRandomIndex(data.tightends.size()-1));
 				playerSet[7] = data.defenses.get(generateRandomIndex(data.defenses.size()-1));
 				playerSet[8] = data.flex.get(generateRandomIndex(data.flex.size()-1));
-				for (int i = 0; i < playerSet.length; i++) {
-					cost += playerSet[i].salary;
-				}
+				cost = getCost(playerSet);
 			}
 		}
 		double points = 0;
@@ -50,7 +48,7 @@ public class LineupGenerator {
 //					System.out.println(playerSet[7].toString());
 			}	
 		}
-		else if (type.equals("draftking")) {
+		else if (type.equals("fantasypros")) {
 			for (int i = 0; i < playerSet.length; i++) {
 				System.out.println(playerSet[i].toString());
 			}
@@ -59,13 +57,12 @@ public class LineupGenerator {
 
 	public static void simulatedAnnealing(DataCollector data, String type)  {
 		float temp = Float.MAX_VALUE;
-		double coolingRate = 0.000001;
+		double coolingRate = 0.0000001;
 
 		Player[] currentLineup = new Player[9];
 		currentLineup = generateInitialLineup(data, type);
 		Player[] bestLineup = new Player[9];
 		bestLineup = currentLineup.clone();
-		int count = 0;
 		while (temp > 1)  {
 			Player[] newLineup = new Player[9];
 			newLineup = currentLineup.clone();
@@ -73,7 +70,7 @@ public class LineupGenerator {
 			int playerPos = 0;
 			if (positionPos == 0) {
 				playerPos = (int) (data.quarterbacks.size() * Math.random());
-				if ((newLineup[1] != data.quarterbacks.get(playerPos)))
+				if ((newLineup[0] != data.quarterbacks.get(playerPos)))
 					newLineup[positionPos]  = data.quarterbacks.get(playerPos);
 			}
 			if ((positionPos == 1) || (positionPos == 2)) {
@@ -120,8 +117,6 @@ public class LineupGenerator {
 			}
 
 			temp *= 1-coolingRate;
-			count ++;
-
 		}
 
 		printLineup(bestLineup, type);
@@ -150,7 +145,7 @@ public class LineupGenerator {
 	public void hillClimbing(DataCollector data) {
 
 	}
-
+	
 
 	private static double getPoints(Player[] lineup) {
 		double points = 0;
