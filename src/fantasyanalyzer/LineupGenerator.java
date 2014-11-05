@@ -27,9 +27,9 @@ public class LineupGenerator {
 		for (int i = 0; i < playerSet.length; i++) {
 			points += playerSet[i].projection;
 		}
-		printLineup(playerSet, type);
+		//printLineup(playerSet, type);
 		DecimalFormat df = new DecimalFormat("#.##");
-		System.out.println ("\nThe starting number of points is " + df.format(points) + " with a cost of " + cost +"\n");
+		//System.out.println ("\nThe starting number of points is " + df.format(points) + " with a cost of " + cost +"\n");
 		return playerSet;
 	}
 
@@ -54,10 +54,29 @@ public class LineupGenerator {
 			}
 		}
 	}
+	
+	public static void metaAnnealing(DataCollector data, String type) {
+		double bestScore;
+		Player[] lineup = new Player[9];
+		Player[] bestLineup = new Player[9];
+		bestLineup = LineupGenerator.simulatedAnnealing(data, type).clone();
+		bestScore = getPoints(bestLineup);
+		for (int i = 0; i < 20000; i++) {
+			lineup = LineupGenerator.simulatedAnnealing(data, type).clone();
+			System.out.println(i);
+			if (getPoints(lineup) > bestScore) {
+				bestLineup = lineup.clone();
+				bestScore = getPoints(lineup);
+			}
+		}
+		
+		System.out.println("The meta score is: " + bestScore);
+	}
 
-	public static void simulatedAnnealing(DataCollector data, String type)  {
+	public static Player[] simulatedAnnealing(DataCollector data, String type)  {
 		float temp = Float.MAX_VALUE;
-		double coolingRate = 0.0000001;
+		//double coolingRate = 0.0000001;
+		double coolingRate = 0.001;
 
 		Player[] currentLineup = new Player[9];
 		currentLineup = generateInitialLineup(data, type);
@@ -119,7 +138,7 @@ public class LineupGenerator {
 			temp *= 1-coolingRate;
 		}
 
-		printLineup(bestLineup, type);
+		//printLineup(bestLineup, type);
 		double points = 0;
 		int cost = 0;
 		for (int i = 0; i < bestLineup.length; i++) {
@@ -127,9 +146,9 @@ public class LineupGenerator {
 			cost += bestLineup[i].salary;
 		}
 		DecimalFormat df = new DecimalFormat("#.##");
-		System.out.println ("\nThe ending number of points is " + df.format(points) + " with a cost of " + cost);
+		//System.out.println ("\nThe ending number of points is " + df.format(points) + " with a cost of " + cost);
 
-
+		return bestLineup;
 
 	}
 

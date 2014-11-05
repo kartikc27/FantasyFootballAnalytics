@@ -246,8 +246,10 @@ public class DataCollector {
 	}
 
 	public static void main(String[] args) throws BiffException, IOException {
-		DataCollector data = new DataCollector(10, "fantasypros");
-		LineupGenerator.simulatedAnnealing(data, "fantasypros");
+		DataCollector data = new DataCollector(9, "propmonkey");
+		//LineupGenerator.simulatedAnnealing(data, "fantasypros");
+		LineupGenerator.metaAnnealing(data, "propmonkey");
+
 	}
 
 
